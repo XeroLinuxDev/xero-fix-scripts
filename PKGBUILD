@@ -5,7 +5,7 @@ pkgver=1.7
 pkgrel=1
 pkgdesc="Some Scripted Tools"
 arch=('any')
-url="https://github.com/XeroLinux"
+url="https://github.com/XeroLinuxDev"
 license=('GPL3')
 depends=('rate-mirrors-bin')
 makedepends=('git')
@@ -17,7 +17,6 @@ sha256sums=('SKIP')
 package() {
 	install -dm755 ${pkgdir}${_destname1}
 	cp -r ${srcdir}/${pkgname}${_destname1}/* ${pkgdir}${_destname1}
-	rm "${pkgdir}${_destname1}/push.sh"
 	rm "${pkgdir}${_destname1}/README.md"
 	rm "${pkgdir}${_destname1}/PKGBUILD"
 	rm "${pkgdir}${_destname1}/LICENSE"
