@@ -3,10 +3,10 @@
 echo "#################################"
 echo "       Restarting PipeWire       "
 echo "#################################"
-sleep 1.5
+sleep 2
 systemctl --user restart pipewire
 systemctl --user restart pipewire-pulse
-sleep 1.5
+sleep 2
 echo
 echo "#################################"
 echo "        All Done, Try now       "
