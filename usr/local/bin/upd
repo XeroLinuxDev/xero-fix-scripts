@@ -78,7 +78,7 @@ else
 fi
 
 # Prompt before system update
-read -rp "$(echo -e "${CYAN}🚀 Proceed with full system update? (Y/n): ${RESET}")" confirm_update
+read -rp "$(echo -e "${CYAN}🚀 Update protocol ready. Execute ? (Y/n): ${RESET}")" confirm_update
 if [[ -z "$confirm_update" || "$confirm_update" =~ ^[Yy]$ ]]; then
   echo
   echo -e "${MAGENTA}📦 Updating system packages...${RESET}"
@@ -97,7 +97,7 @@ echo
 
 # Optional Flatpak update
 if command -v flatpak &>/dev/null; then
-  read -rp "$(echo -e "${CYAN}📦 Flatpak detected. Update Flatpak apps? (Y/n): ${RESET}")" update_flatpak
+  read -rp "$(echo -e "${CYAN}📦 Flatpak node online. Sync app containers now ? (Y/n): ${RESET}")" update_flatpak
   if [[ -z "$update_flatpak" || "$update_flatpak" =~ ^[Yy]$ ]]; then
     echo
     echo -e "${MAGENTA}📦 Updating Flatpak apps...${RESET}"
@@ -116,7 +116,7 @@ echo
 
 # Optional Rust toolchain update
 if command -v rustup &>/dev/null; then
-  read -rp "$(echo -e "${CYAN}🦀 Rustup detected. Update Rust toolchain? (Y/n): ${RESET}")" update_rust
+  read -rp "$(echo -e "${CYAN}🦀 Rustup found. Sync toolchain update ? (Y/n): ${RESET}")" update_rust
   if [[ -z "$update_rust" || "$update_rust" =~ ^[Yy]$ ]]; then
     echo
     echo -e "${MAGENTA}🦀 Updating Rust toolchain...${RESET}"
@@ -133,10 +133,10 @@ echo
 # Firmware update option using fwupd
 if is_vm; then
   echo
-  echo -e "${CYAN}🖥️  Virtual Machine detected. Skipping firmware updates.${RESET}"
+  echo -e "${CYAN}🖥️ VM shell detected-firmware patch sequence suspended.${RESET}"
 else
   if command -v fwupdmgr >/dev/null 2>&1; then
-    read -rp "$(echo -e "${CYAN}🧩 fwupd detected! Check & apply device firmware updates? (Y/n): ${RESET}")" confirm_fwupd
+    read -rp "$(echo -e "${CYAN}🧩 fwupd daemon active. Deploy firmware update sequence ? (Y/n): ${RESET}")" confirm_fwupd
     if [[ -z "$confirm_fwupd" || "$confirm_fwupd" =~ ^[Yy]$ ]]; then
       echo
       echo -e "${MAGENTA}🔄 Refreshing firmware metadata...${RESET}"
@@ -165,9 +165,9 @@ fi
 
 # Final status message
 if [ "$skipped_updates" = true ]; then
-  echo -e "${ORANGE}💡 Looks like you skipped some updates. Try not to, for system stability.${RESET}"
+  echo -e "${ORANGE}💡 Some updates bypassed. Stability needs updates !${RESET}"
 else
-  echo -e "${LIGHT_GREEN}✅ System update complete. System fully synced.${RESET}"
+  echo -e "${LIGHT_GREEN}✅ Update’s in. Sync’s locked.${RESET}"
 fi
 
 # --- Smart reboot prompt ---
@@ -195,7 +195,7 @@ fi
 # Prompt user if reboot needed
 if [ "$need_reboot" = true ]; then
   echo
-  read -rp "$(echo -e "${CYAN}🔄 Core changes in place.  to seal the deal ? (Y/n): ${RESET}")" confirm_reboot
+  read -rp "$(echo -e "${CYAN}🔄 Core changes in place. Reboot to seal the deal ? (Y/n): ${RESET}")" confirm_reboot
   if [[ -z "$confirm_reboot" || "$confirm_reboot" =~ ^[Yy]$ ]]; then
     echo
     echo -e "${MAGENTA}♻️ Rebooting system...${RESET}"
@@ -203,7 +203,7 @@ if [ "$need_reboot" = true ]; then
     sudo reboot
   else
     echo
-    echo -e "${RED}⚠️ Critical updates pending! Please reboot manually as soon as possible.${RESET}"
+    echo -e "${RED}⚠️ Critical update queued! Reboot when possible !${RESET}"
   fi
 fi
 
