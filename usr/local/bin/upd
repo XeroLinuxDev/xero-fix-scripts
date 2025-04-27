@@ -195,7 +195,7 @@ fi
 # Prompt user if reboot needed
 if [ "$need_reboot" = true ]; then
   echo
-  read -rp "$(echo -e "${CYAN}🔄 Core system changes detected. Reboot now? (Y/n): ${RESET}")" confirm_reboot
+  read -rp "$(echo -e "${CYAN}🔄 Core changes in place.  to seal the deal ? (Y/n): ${RESET}")" confirm_reboot
   if [[ -z "$confirm_reboot" || "$confirm_reboot" =~ ^[Yy]$ ]]; then
     echo
     echo -e "${MAGENTA}♻️ Rebooting system...${RESET}"
