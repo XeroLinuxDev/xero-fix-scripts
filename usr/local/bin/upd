@@ -164,8 +164,7 @@ fi
 
 # Final status message
 if [ "$skipped_updates" = true ]; then
-  echo -e "${ORANGE}⚠️ You have opted to skip a few updates.${RESET}"
-  echo -e "${YELLOW}💡 It's highly recommended that you don't skip any to ensure system stability.${RESET}"
+  echo -e "${ORANGE}💡 Looks like you skipped some updates. Try not to, for system stability.${RESET}"
 else
   echo -e "${LIGHT_GREEN}✅ System update complete. System fully synced.${RESET}"
 fi
