@@ -161,7 +161,7 @@ else
     echo -e "${RED}❌ fwupd is not installed on this system.${RESET}"
   fi
 fi
-
+echo
 # Final status message
 if [ "$skipped_updates" = true ]; then
   echo -e "${ORANGE}💡 Looks like you skipped some updates. Try not to, for system stability.${RESET}"
