@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
 # XeroLinux System Updater
+# ---------------------------------------
+# - Updates system packages (Pacman, Yay, or Paru)
+# - Updates Flatpak applications
+# - Updates Rust toolchain (if installed)
+# - Updates device firmware (fwupd, skipped inside VMs)
+# - Tracks if updates were skipped
+# - Smartly detects if a reboot is needed (kernel/firmware)
+# - Provides clean, colorful prompts with emojis
+# ---------------------------------------
+# Written for a smoother, safer update experience 🚀
 
 set -e
 
@@ -16,7 +26,18 @@ ORANGE='\033[0;33m'
 LIGHT_GREEN='\033[1;32m'
 RESET='\033[0m'
 
+# Track if any updates were skipped
 skipped_updates=false
+must_reboot=false
+
+# Function to detect if running inside a VM
+is_vm() {
+  if command -v systemd-detect-virt &>/dev/null; then
+    [[ "$(systemd-detect-virt)" != "none" ]]
+  else
+    return 1
+  fi
+}
 
 # Banner function
 print_title() {
@@ -26,7 +47,7 @@ print_title() {
     figlet -f small "XeroLinux Updater"
   else
     echo "╔════════════════════════════════════════════════════╗"
-    echo "║              XeroLinux System Updater             ║"
+    echo "║              XeroLinux System Updater              ║"
     echo "╚════════════════════════════════════════════════════╝"
   fi
   echo -e "${RESET}"
@@ -71,11 +92,11 @@ else
   echo -e "${ORANGE}⚠️ Skipped system update.${RESET}"
   skipped_updates=true
 fi
-
 echo
+
 # Optional Flatpak update
 if command -v flatpak &>/dev/null; then
-  read -rp "$(echo -e "${CYAN}📦 Flatpak detected. Update Flatpak apps ? (Y/n): ${RESET}")" update_flatpak
+  read -rp "$(echo -e "${CYAN}📦 Flatpak detected. Update Flatpak apps? (Y/n): ${RESET}")" update_flatpak
   if [[ -z "$update_flatpak" || "$update_flatpak" =~ ^[Yy]$ ]]; then
     echo
     echo -e "${MAGENTA}📦 Updating Flatpak apps...${RESET}"
@@ -86,12 +107,15 @@ if command -v flatpak &>/dev/null; then
     echo -e "${ORANGE}⚠️ Skipped Flatpak updates.${RESET}"
     skipped_updates=true
   fi
+else
+  echo
+  echo -e "${CYAN}❌ Flatpak is not installed. Skipping Flatpak updates.${RESET}"
 fi
-
 echo
+
 # Optional Rust toolchain update
 if command -v rustup &>/dev/null; then
-  read -rp "$(echo -e "${CYAN}🦀 Rustup detected. Update ? (Y/n): ${RESET}")" update_rust
+  read -rp "$(echo -e "${CYAN}🦀 Rustup detected. Update Rust toolchain? (Y/n): ${RESET}")" update_rust
   if [[ -z "$update_rust" || "$update_rust" =~ ^[Yy]$ ]]; then
     echo
     echo -e "${MAGENTA}🦀 Updating Rust toolchain...${RESET}"
@@ -103,26 +127,82 @@ if command -v rustup &>/dev/null; then
     skipped_updates=true
   fi
 fi
-
 echo
+
 # Firmware update option using fwupd
-if command -v fwupdmgr >/dev/null 2>&1; then
-  read -rp "$(echo -e "${CYAN}🧩 fwupd detected ! Check & apply device firmware updates? (Y/n): ${RESET}")" confirm_fwupd
-  if [[ -z "$confirm_fwupd" || "$confirm_fwupd" =~ ^[Yy]$ ]]; then
-    echo
-    echo -e "${MAGENTA}🔄 Refreshing firmware metadata...${RESET}"
-    echo
-    sudo fwupdmgr refresh --force && sudo fwupdmgr update
+if is_vm; then
+  echo
+  echo -e "${CYAN}🖥️  Virtual Machine detected. Skipping firmware updates.${RESET}"
+else
+  if command -v fwupdmgr >/dev/null 2>&1; then
+    read -rp "$(echo -e "${CYAN}🧩 fwupd detected! Check & apply device firmware updates? (Y/n): ${RESET}")" confirm_fwupd
+    if [[ -z "$confirm_fwupd" || "$confirm_fwupd" =~ ^[Yy]$ ]]; then
+      echo
+      echo -e "${MAGENTA}🔄 Refreshing firmware metadata...${RESET}"
+      echo
+      sudo fwupdmgr refresh --force
+      echo
+      echo -e "${MAGENTA}⚙️  Checking and applying available firmware updates...${RESET}"
+      echo
+      sudo fwupdmgr update
+      echo
+      # Check if any firmware updates require a reboot
+      if fwupdmgr get-devices --no-metadata-refresh | grep -q "Requires reboot"; then
+        echo -e "${RED}⚡ Firmware update requires a reboot to complete!${RESET}"
+        must_reboot=true
+      fi
+    else
+      echo
+      echo -e "${ORANGE}⚠️ Skipped firmware update.${RESET}"
+      skipped_updates=true
+    fi
   else
     echo
-    echo -e "${ORANGE}⚠️ Skipped firmware update.${RESET}"
-    skipped_updates=true
+    echo -e "${RED}❌ fwupd is not installed on this system.${RESET}"
   fi
 fi
-
 echo
+
+# Final status message
 if [ "$skipped_updates" = true ]; then
   echo -e "${ORANGE}⚠️ Looks like you skipped some updates. Try not to, for system stability.${RESET}"
 else
   echo -e "${LIGHT_GREEN}✅ System update complete. You’re all set!${RESET}"
+fi
+
+# --- Smart reboot prompt ---
+echo
+
+# Get current running kernel
+current_kernel=$(uname -r)
+
+# Get latest installed kernel (folder name inside /usr/lib/modules)
+installed_kernel=$(ls -1 /usr/lib/modules/ | sort -V | tail -n 1)
+
+need_reboot=false
+
+if [[ -n "$installed_kernel" && "$installed_kernel" != "$current_kernel" ]]; then
+  echo -e "${RED}⚡ Kernel mismatch:${RESET} ${YELLOW}${BOLD}${current_kernel}${RESET}${YELLOW} → ${BOLD}${installed_kernel}${RESET}${YELLOW}. Reboot required.${RESET}"
+  need_reboot=true
+fi
+
+# Also check if firmware update said reboot needed
+if [ "$must_reboot" = true ]; then
+  need_reboot=true
+fi
+
+if [ "$need_reboot" = true ]; then
+  echo
+  read -rp "$(echo -e "${CYAN}🔄 Core system changes detected. Reboot now? (Y/n): ${RESET}")" confirm_reboot
+  if [[ -z "$confirm_reboot" || "$confirm_reboot" =~ ^[Yy]$ ]]; then
+    echo
+    echo -e "${MAGENTA}♻️ Rebooting system...${RESET}"
+    sleep 2
+    sudo reboot
+  else
+    echo
+    echo -e "${RED}⚠️ Critical updates pending! Please reboot manually as soon as possible.${RESET}"
+  fi
+else
+  echo -e "${LIGHT_GREEN}🖥️ System state: [OK] — No reboot needed !${RESET}"
 fi
