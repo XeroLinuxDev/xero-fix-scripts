@@ -154,6 +154,7 @@ else
     else
       echo
       echo -e "${ORANGE}⚠️ Skipped firmware update.${RESET}"
+      echo
       skipped_updates=true
     fi
   else
@@ -161,7 +162,7 @@ else
     echo -e "${RED}❌ fwupd is not installed on this system.${RESET}"
   fi
 fi
-echo
+
 # Final status message
 if [ "$skipped_updates" = true ]; then
   echo -e "${ORANGE}💡 Looks like you skipped some updates. Try not to, for system stability.${RESET}"
@@ -208,5 +209,5 @@ fi
 
 # Always show final [ OK ] if no reboot was needed
 if [ "$need_reboot" = false ]; then
-  echo -e "${LIGHT_GREEN}[  OK  ]${RESET} System fully updated. No reboot needed."
+  echo -e "${LIGHT_GREEN}[  OK  ]${RESET} All systems synced and firing on all cylinders. No reboot needed."
 fi
