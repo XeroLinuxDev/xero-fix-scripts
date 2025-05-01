@@ -2,12 +2,11 @@
 pkgname=xero-fix-scripts
 _destname1="/"
 pkgver=2.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Some Scripted Tools"
 arch=('any')
 url="https://github.com/XeroLinuxDev"
 license=('GPL3')
-depends=('rate-mirrors')
 makedepends=('git')
 conflicts=('xero-fix-tools-dev')
 provides=("${pkgname}")
