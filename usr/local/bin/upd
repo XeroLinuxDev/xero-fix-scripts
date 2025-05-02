@@ -109,7 +109,6 @@ if command -v flatpak &>/dev/null; then
     skipped_updates=true
   fi
 else
-  echo
   echo -e "${CYAN}❌ Flatpak is not installed. Skipping Flatpak updates.${RESET}"
 fi
 echo
@@ -158,13 +157,13 @@ else
       skipped_updates=true
     fi
   else
-    echo
     echo -e "${RED}❌ fwupd is not installed on this system.${RESET}"
   fi
 fi
 
 # Final status message
 if [ "$skipped_updates" = true ]; then
+  echo
   echo -e "${ORANGE}💡 Some updates bypassed. Stability needs updates !${RESET}"
 else
   echo -e "${LIGHT_GREEN}✅ Update’s in. Sync’s locked.${RESET}"
@@ -199,7 +198,7 @@ if [ "$need_reboot" = true ]; then
   if [[ -z "$confirm_reboot" || "$confirm_reboot" =~ ^[Yy]$ ]]; then
     echo
     echo -e "${MAGENTA}♻️ Rebooting system...${RESET}"
-    sleep 2
+    sleep 3
     sudo reboot
   else
     echo
@@ -211,3 +210,5 @@ fi
 if [ "$need_reboot" = false ]; then
   echo -e "${LIGHT_GREEN}[  OK  ]${RESET} All systems synced and firing on all cylinders. No reboot needed."
 fi
+
+sleep 5
