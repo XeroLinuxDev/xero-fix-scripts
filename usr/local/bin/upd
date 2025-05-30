@@ -208,7 +208,7 @@ fi
 
 # Always show final [ OK ] if no reboot was needed
 if [ "$need_reboot" = false ]; then
-  echo -e "${LIGHT_GREEN}[  OK  ]${RESET} All systems synced and firing on all cylinders. No reboot needed."
+  echo -e "${LIGHT_GREEN}[  OK  ]${RESET} All systems synced and firing on all cylinders."
 fi
 
 sleep 5
