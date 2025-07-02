@@ -66,11 +66,25 @@ set_parallel_downloads() {
         echo -e "${YELLOW}New configuration:${NC} $(grep "ParallelDownloads" /etc/pacman.conf)"
         echo
         read -p "Press Enter to continue..."
-        clear && exec xero-cli -m
+        if [ -n "$SUDO_USER" ]; then
+          clear
+          sudo -K
+          exec sudo -u "$SUDO_USER" xero-cli -m
+        else
+          clear
+          exec xero-cli -m
+        fi
     else
         echo -e "${RED}Failed to update ParallelDownloads setting${NC}"
         read -p "Press Enter to continue..."
-        clear && exec xero-cli -m
+        if [ -n "$SUDO_USER" ]; then
+          clear
+          sudo -K
+          exec sudo -u "$SUDO_USER" xero-cli -m
+        else
+          clear
+          exec xero-cli -m
+        fi
     fi
 }
 
@@ -106,18 +120,39 @@ while true; do
             echo
             restore_backup
             read -p "Press Enter to continue..."
-            clear && exec xero-cli -m
+            if [ -n "$SUDO_USER" ]; then
+              clear
+              sudo -K
+              exec sudo -u "$SUDO_USER" xero-cli -m
+            else
+              clear
+              exec xero-cli -m
+            fi
             ;;
         3)
             echo
             echo -e "${BLUE}Returning to main menu...${NC}"
-            clear && exec xero-cli -m
+            if [ -n "$SUDO_USER" ]; then
+              clear
+              sudo -K
+              exec sudo -u "$SUDO_USER" xero-cli -m
+            else
+              clear
+              exec xero-cli -m
+            fi
             ;;
         *)
             echo
             echo -e "${RED}Invalid choice${NC}"
             read -p "Press Enter to continue..."
-            clear && exec xero-cli -m
+            if [ -n "$SUDO_USER" ]; then
+              clear
+              sudo -K
+              exec sudo -u "$SUDO_USER" xero-cli -m
+            else
+              clear
+              exec xero-cli -m
+            fi
             ;;
     esac
 done
