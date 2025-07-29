@@ -112,6 +112,7 @@ fi
 
 if is_vm; then
   echo -e "\n${CYAN}🖥️ VM shell detected-firmware patch sequence suspended.${RESET}"
+  echo
 else
   if command -v fwupdmgr >/dev/null 2>&1; then
     read -rp "$(echo -e "\n${CYAN}🧩 fwupd daemon active. Deploy firmware update sequence ? (Y/n): ${RESET}")" confirm_fwupd
